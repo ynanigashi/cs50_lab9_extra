@@ -3,7 +3,7 @@ import re
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from models import Birthdays
+from models import Birthdays, Base
 from sqlalchemy import select
 
 
@@ -42,7 +42,7 @@ def index():
                 birthday = Birthdays(name=name, month=month, day=day)
                 ss.add(birthday)
                 ss.commit()
-
+        flash(f"{name}'s birthday has saved", 'success')
         return redirect("/")
 
     else:
@@ -55,3 +55,12 @@ def index():
 
         return render_template("index.html", birthdays=birthdays)
 
+@app.route('/init_db')
+def init_db():
+    try:
+        Base.metadata.drop_all(engine)
+    except Exception as e:
+        print('drop error! but continue')
+
+    Base.metadata.create_all(engine)
+    return {"result": "ok"}
