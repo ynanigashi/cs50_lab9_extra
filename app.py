@@ -64,3 +64,7 @@ def init_db():
 
     Base.metadata.create_all(engine)
     return {"result": "ok"}
+
+
+if __name__ == '__main__':
+    app.run()
