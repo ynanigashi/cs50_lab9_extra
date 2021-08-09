@@ -19,7 +19,8 @@ app.config['SECRET_KEY'] = b'\x08\x14\x15\xde\x041h5\x1b\xd8\xc0Wb\x8e\x83\x1f\x
 # create sqlalchemy engin
 # create_engine.future flag set to True so that we make full use of 2.0 style usage:
 # create_engine.echo, which will instruct the Engine to log all of the SQL it emits to a Python logger that will write to standard out. This flag is a shorthand way of setting up Python logging more formally and is useful for experimentation in scripts.
-engine = create_engine('sqlite+pysqlite:///birthdays.db', future=True, echo=True)
+DB_DSN = os.environ.get('DB_DSN') or 'sqlite+pysqlite:///birthdays.db'
+engine = create_engine(DB_DSN, future=True, echo=True)
 
 DATE_PATTERN = '^\d{4}(-\d{2}){2}$'
 
@@ -55,7 +56,6 @@ def index():
 
         return render_template("index.html", birthdays=birthdays)
 
-@app.route('/init_db')
 def init_db():
     try:
         Base.metadata.drop_all(engine)
@@ -63,7 +63,7 @@ def init_db():
         print('drop error! but continue')
 
     Base.metadata.create_all(engine)
-    return {"result": "ok"}
+    print('create_all is done')
 
 
 if __name__ == '__main__':
