@@ -19,7 +19,8 @@ app.config['SECRET_KEY'] = b'\x08\x14\x15\xde\x041h5\x1b\xd8\xc0Wb\x8e\x83\x1f\x
 # create sqlalchemy engin
 # create_engine.future flag set to True so that we make full use of 2.0 style usage:
 # create_engine.echo, which will instruct the Engine to log all of the SQL it emits to a Python logger that will write to standard out. This flag is a shorthand way of setting up Python logging more formally and is useful for experimentation in scripts.
-DATABASE_URL = os.environ.get('DATABASE_URL').replace('postgres://','postgresql://') or 'sqlite+pysqlite:///birthdays.db'
+DATABASE_URL = os.environ.get('DATABASE_URL') or 'sqlite+pysqlite:///birthdays.db'
+DATABASE_URL = DATABASE_URL.replace('postgres://','postgresql://') 
 engine = create_engine(DATABASE_URL, future=True, echo=True)
 
 DATE_PATTERN = '^\d{4}(-\d{2}){2}$'
@@ -50,9 +51,9 @@ def index():
         # Display the entries in the database on index.html
         birthdays = []
         with Session(engine) as ss:
-            stmt = select(Birthdays.name, Birthdays.month, Birthdays.day).order_by(Birthdays.id.desc())
-            for name, month, day in ss.execute(stmt):
-                birthdays.append({'name': name, 'month': month, 'day': day})
+            rows = ss.query(Birthdays).order_by(Birthdays.id.desc())
+            for row in rows:
+                birthdays.append({'name': row.name, 'month': row.month, 'day': row.day})
 
         return render_template("index.html", birthdays=birthdays)
 
