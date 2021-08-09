@@ -12,4 +12,10 @@
     https://devcenter.heroku.com/ja/articles/heroku-postgresql
     
     - postgresSQLを利用できるようにアプリを書き換える
-    
+
+    - DBを初期化する
+    ```
+    heroku run python -a <application_name>
+    >>> from app import init_db
+    >>> init_db()
+    ```
